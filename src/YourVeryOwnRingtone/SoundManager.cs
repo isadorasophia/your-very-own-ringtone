@@ -47,17 +47,29 @@ namespace YourVeryOwnRingtone
                 throw new ArgumentException("Unable to deserialize configuration file.");
             }
 
+            // The configuration file paths may be relative to the configuration file.
+            string rootDirectory = Path.GetDirectoryName(configurationFile);
+
             lock (_lock)
             {
                 foreach (string sound in AvailableSounds)
                 {
-                    if (sounds.TryGetValue(sound, out string path) && File.Exists(path))
+                    if (sounds.TryGetValue(sound, out string path))
                     {
-                        System.Media.SoundPlayer player = new(path);
-                        player.LoadAsync();
+                        if (!Path.IsPathRooted(path))
+                        {
+                            path = Path.Join(rootDirectory, relativePath);
+                        }
+                        
+                        path = Path.IsPathRooted(path) ? Path.Join(rootDirectory, relativePath);
+                        if (File.Exists(rootPath))
+                        {
+                            System.Media.SoundPlayer player = new(rootPath);
+                            player.LoadAsync();
 
-                        _sounds[sound] = player;
-                    }
+                            _sounds[sound] = player;
+                        }
+                    } 
                 }
             }
         }
