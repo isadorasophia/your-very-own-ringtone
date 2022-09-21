@@ -82,6 +82,8 @@ namespace YourVeryOwnRingtone
 
         private void OnAfterExecute(string guid, int id, object _, object __)
         {
+            ThreadHelper.ThrowIfOnUIThread();
+
             string name = GetCommandName(guid, id);
             switch (name)
             {
