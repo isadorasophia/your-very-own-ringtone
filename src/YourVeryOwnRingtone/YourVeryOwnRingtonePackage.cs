@@ -29,6 +29,7 @@ namespace YourVeryOwnRingtone
     /// </para>
     /// </remarks>
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
+    [ProvideAutoLoad(UIContextGuids80.NoSolution, PackageAutoLoadFlags.BackgroundLoad)]
     [ProvideAutoLoad(UIContextGuids80.SolutionExists, PackageAutoLoadFlags.BackgroundLoad)]
     [ProvideAutoLoad(UIContextGuids80.Debugging, PackageAutoLoadFlags.BackgroundLoad)]
     [Guid(YourVeryOwnRingtonePackage.PackageGuidString)]
@@ -47,7 +48,7 @@ namespace YourVeryOwnRingtone
 
         private OptionsPage _optionsPage { get; set; } = null!;
 
-        private DebugListener? _listener;
+        private VSListener? _listener;
 
         #region Package Members
 
@@ -70,6 +71,8 @@ namespace YourVeryOwnRingtone
             }
 
             componentModel.DefaultCompositionService.SatisfyImportsOnce(this);
+
+            await _soundManager.InitializeAsync(this);
 
             _optionsPage = (OptionsPage)GetDialogPage(typeof(OptionsPage));
             await _optionsPage.InitializeAsync(_soundManager);

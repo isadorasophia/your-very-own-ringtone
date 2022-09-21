@@ -11,23 +11,29 @@ namespace YourVeryOwnRingtone
     public sealed class OptionsPage : DialogPage
     {
         private string _configurationFile = string.Empty;
+        private bool _disableSounds = false;
 
-        private Func<string, Task>? _onUpdate;
+        private SoundManager? _manager;
 
         public async Task InitializeAsync(SoundManager manager)
         {
-            _onUpdate = manager.RefreshSoundsAsync;
+            _manager = manager;
+
             await RefreshAsync();
         }
 
+        /// <summary>
+        /// Refresh all settings of the options page to the manager.
+        /// </summary>
         public async Task RefreshAsync()
         {
-            if (_onUpdate is null)
+            if (_manager is null)
             {
                 return;
             }
 
-            await _onUpdate.Invoke(_configurationFile);
+            await _manager.RefreshSoundsAsync(_configurationFile);
+            _manager.SetSound(!_disableSounds);
         }
 
         [Category("Sounds Settings")]
@@ -38,8 +44,27 @@ namespace YourVeryOwnRingtone
             get => _configurationFile;
             set
             {
-                _configurationFile = value;
-                _ = RefreshAsync();
+                if (_configurationFile != value)
+                {
+                    _configurationFile = value;
+                    _ = _manager?.RefreshSoundsAsync(value);
+                }
+            }
+        }
+
+        [Category("Sounds Settings")]
+        [DisplayName("Disable Sounds")]
+        [Description("Check to disable any sounds.")]
+        public bool DisableSounds
+        {
+            get => _disableSounds;
+            set
+            {
+                if (_disableSounds != value)
+                {
+                    _disableSounds = value;
+                    _manager?.SetSound(!_disableSounds);
+                }
             }
         }
     }
