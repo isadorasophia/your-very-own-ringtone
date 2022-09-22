@@ -21,7 +21,6 @@ namespace YourVeryOwnRingtone
 
         private readonly Dictionary<Guid, string> _events = new Dictionary<Guid, string>
         {
-            { typeof(IDebugProgramCreateEvent2).GUID, "start" },
             { typeof(IDebugSessionDestroyEvent2).GUID, "stop" },
             { typeof(IDebugBreakpointEvent2).GUID, "breakpoint" },
             { typeof(IDebugExceptionEvent2).GUID, "exception" },
@@ -46,7 +45,7 @@ namespace YourVeryOwnRingtone
             if (await serviceProvider.GetServiceAsync(typeof(DTE)) is DTE2 dte)
             {
                 _commandEvents = dte.Events.get_CommandEvents(null, 0);
-                _commandEvents.AfterExecute += OnAfterExecute;
+                _commandEvents.BeforeExecute += OnBeforeExecute;
 
                 _commands = dte.Commands as Commands2;
             }
@@ -80,7 +79,7 @@ namespace YourVeryOwnRingtone
             return 0;
         }
 
-        private void OnAfterExecute(string guid, int id, object _, object __)
+        private void OnBeforeExecute(string guid, int id, object _, object __, ref bool ___)
         {
             _ = ProcessCommandAsync(guid, id);
         }
@@ -98,12 +97,20 @@ namespace YourVeryOwnRingtone
                     ProcessSoundEvent("build");
                     break;
 
+                case "File.SaveSelectedItems":
+                    ProcessSoundEvent("save");
+                    break;
+
                 case "Edit.Find":
                     ProcessSoundEvent("find");
                     break;
 
                 case "Edit.Undo":
                     ProcessSoundEvent("undo");
+                    break;
+
+                case "Debug.Start":
+                    ProcessSoundEvent("start");
                     break;
 
                 case "Debug.StepOver":
@@ -128,6 +135,11 @@ namespace YourVeryOwnRingtone
             }
         }
 
+        private readonly Dictionary<(Guid, int), string> _hardcodedCommands = new Dictionary<(Guid, int), string>
+        {
+            { (new("C9DD4A59-47FB-11D2-83E7-00C04F9902C1"), 61476), "Debug.ApplyCodeChanges" }
+        };
+
         private string GetCommandName(string guid, int id)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
@@ -143,6 +155,12 @@ namespace YourVeryOwnRingtone
                 result = _commands?.Item(guid, id).Name ?? string.Empty;
             }
             catch { }
+
+            if (string.IsNullOrEmpty(result) && 
+                _hardcodedCommands.TryGetValue((new(guid), id), out result))
+            {
+                return result;
+            }
 
             return result;
         }

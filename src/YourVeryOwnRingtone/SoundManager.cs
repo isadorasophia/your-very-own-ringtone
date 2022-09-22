@@ -5,8 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System;
+using System.Media;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Shell;
+using System.Reflection;
 
 #nullable enable
 
@@ -16,27 +18,33 @@ namespace YourVeryOwnRingtone
     public sealed class SoundManager
     {
         private readonly string[] AvailableSounds = new string[] 
-            { 
-                "apply",
-                "build",
-                "breakpoint",
-                "exception",
-                "find",
-                "restart",
-                "start",
-                "step",
-                "stepover",
-                "stepinto",
-                "stepout",
-                "stop",
-                "undo"
-            };
+        { 
+            "apply",
+            "build",
+            "breakpoint",
+            "exception",
+            "find",
+            "restart",
+            "save",
+            "start",
+            "step",
+            "stepover",
+            "stepinto",
+            "stepout",
+            "stop",
+            "undo"
+        };
 
-        public Dictionary<string, System.Media.SoundPlayer> _sounds = new();
+        private readonly string _defaultConfigurationFile = Path.Combine(
+            Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "themes", "lofi", "settings.json");
+
+        public Dictionary<string, List<SoundPlayer>> _sounds = new();
 
         private readonly object _lock = new();
 
         private bool _isEnabled = true;
+
+        private readonly Random _random = new();
 
         /// <summary>
         /// Used to write responsive messages to the user.
@@ -60,7 +68,7 @@ namespace YourVeryOwnRingtone
             outputWindow?.CreatePane(_guid, _paneTitle, fInitVisible: 0, fClearWithSolution: 0);
             outputWindow?.GetPane(_guid, out _pane);
 
-            _pane?.OutputStringThreadSafe("Your very own ringtone! is all set.\n");
+            _pane?.OutputStringThreadSafe("Your very own ringtone! was just loaded.\n");
             _pane?.Activate();
         }
 
@@ -89,10 +97,13 @@ namespace YourVeryOwnRingtone
                     _ = _bar?.SetText("Your very own ringtone! was unable to load the configuration file.\n");
                 }
 
-                return;
+                _pane?.OutputStringThreadSafe("Loading default sounds...\n");
+                configurationFile = _defaultConfigurationFile;
             }
-
-            _pane?.OutputStringThreadSafe($"Loading sounds for {configurationFile}...\n");
+            else
+            {
+                _pane?.OutputStringThreadSafe($"Loading sounds for {configurationFile}\n");
+            }
 
             string jsonText = await ReadAllTextAsync(configurationFile);
 
@@ -113,23 +124,35 @@ namespace YourVeryOwnRingtone
             {
                 foreach (string sound in AvailableSounds)
                 {
-                    if (sounds.TryGetValue(sound, out string path))
+                    if (sounds.TryGetValue(sound, out string valuePath))
                     {
-                        if (!Path.IsPathRooted(path))
+                        // We support multiple paths in the same sound, so iterate over all of them.
+                        string[] paths = valuePath.Split(',');
+                        for (int i = 0; i < paths.Length; ++i)
                         {
-                            path = Path.Combine(rootDirectory, path);
-                        }
-                        
-                        if (File.Exists(path))
-                        {
-                            System.Media.SoundPlayer player = new(path);
-                            player.LoadAsync();
+                            string path = paths[i];
+                            if (!Path.IsPathRooted(path))
+                            {
+                                path = Path.Combine(rootDirectory, path);
+                            }
 
-                            _sounds[sound] = player;
+                            if (File.Exists(path))
+                            {
+                                SoundPlayer player = new(path);
+                                player.LoadAsync();
 
-                            _pane?.OutputStringThreadSafe($"Loaded sound for {sound} events.\n");
+                                if (!_sounds.TryGetValue(sound, out List<SoundPlayer> soundPlayers))
+                                {
+                                    soundPlayers = new();
+                                    _sounds[sound] = soundPlayers;
+                                }
+
+                                soundPlayers.Add(player);
+
+                                _pane?.OutputStringThreadSafe($"Loaded sound for {sound} events.\n");
+                            }
                         }
-                    } 
+                    }
                 }
             }
 
@@ -158,9 +181,10 @@ namespace YourVeryOwnRingtone
                 return;
             }
 
-            if (_sounds.TryGetValue(name, out var sound))
+            if (_sounds.TryGetValue(name, out List<SoundPlayer> soundPlayers))
             {
-                sound.Play();
+                int soundIndex = _random.Next(soundPlayers.Count);
+                soundPlayers[soundIndex].Play();
             }
         }
     }
