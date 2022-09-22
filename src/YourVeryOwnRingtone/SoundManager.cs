@@ -23,10 +23,12 @@ namespace YourVeryOwnRingtone
                 "exception",
                 "find",
                 "restart",
+                "start",
                 "step",
                 "stepover",
                 "stepinto",
                 "stepout",
+                "stop",
                 "undo"
             };
 
@@ -55,10 +57,10 @@ namespace YourVeryOwnRingtone
             IVsOutputWindow? outputWindow = await serviceProvider.GetServiceAsync(typeof(SVsOutputWindow)) as IVsOutputWindow;
 
             Guid _guid = _paneGuid;
-            outputWindow?.CreatePane(_guid, _paneTitle, fInitVisible: 1, fClearWithSolution: 0);
+            outputWindow?.CreatePane(_guid, _paneTitle, fInitVisible: 0, fClearWithSolution: 0);
             outputWindow?.GetPane(_guid, out _pane);
 
-            _pane?.OutputStringThreadSafe("Your very own ringtone! is all set.");
+            _pane?.OutputStringThreadSafe("Your very own ringtone! is all set.\n");
             _pane?.Activate();
         }
 
@@ -81,8 +83,11 @@ namespace YourVeryOwnRingtone
 
             if (!File.Exists(configurationFile))
             {
-                _pane?.OutputStringThreadSafe($"Unable to load sounds for configuration file: {configurationFile}.\n");
-                _ = _bar?.SetText("Your very own ringtone! was unable to load the configuration file.\n");
+                if (!string.IsNullOrEmpty(configurationFile))
+                {
+                    _pane?.OutputStringThreadSafe($"Unable to load sounds for configuration file: {configurationFile}.\n");
+                    _ = _bar?.SetText("Your very own ringtone! was unable to load the configuration file.\n");
+                }
 
                 return;
             }

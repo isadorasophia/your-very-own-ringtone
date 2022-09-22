@@ -34,7 +34,7 @@ namespace YourVeryOwnRingtone
     [ProvideAutoLoad(UIContextGuids80.Debugging, PackageAutoLoadFlags.BackgroundLoad)]
     [Guid(YourVeryOwnRingtonePackage.PackageGuidString)]
     [ProvideMenuResource("Menus.ctmenu", 1)] // Let the shell know that this package expose a menu.
-    [ProvideOptionPage(typeof(OptionsPage), categoryName: "Your very own ringtone", pageName: "Sounds",
+    [ProvideOptionPage(typeof(OptionsPage), categoryName: "Your very own ringtone!", pageName: "Sounds",
         categoryResourceID: 0, pageNameResourceID: 0, supportsAutomation: false, keywordListResourceId: 0)]
     public sealed class YourVeryOwnRingtonePackage : AsyncPackage
     {

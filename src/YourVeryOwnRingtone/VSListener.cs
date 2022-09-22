@@ -82,12 +82,18 @@ namespace YourVeryOwnRingtone
 
         private void OnAfterExecute(string guid, int id, object _, object __)
         {
-            ThreadHelper.ThrowIfOnUIThread();
+            _ = ProcessCommandAsync(guid, id);
+        }
+
+        private async Task ProcessCommandAsync(string guid, int id)
+        {
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
             string name = GetCommandName(guid, id);
             switch (name)
             {
                 case "Build.BuildSolution":
+                case "Build.BuildOnlyProject":
                 case "Build.Compile":
                     ProcessSoundEvent("build");
                     break;

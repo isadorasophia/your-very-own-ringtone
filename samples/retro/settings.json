@@ -1,0 +1,9 @@
+{
+  "apply": "apply.wav",
+  "breakpoint": "breakpoint.wav",
+  "exception": "exception.wav",
+  "build": "start.wav",
+  "stepinto": "stepinto.wav",
+  "stepover": "stepover.wav",
+  "stop": "stop.wav"
+}
