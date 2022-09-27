@@ -9,6 +9,7 @@ using System.Media;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Shell;
 using System.Reflection;
+using Microsoft.VisualStudio.Threading;
 
 #nullable enable
 
@@ -17,11 +18,14 @@ namespace YourVeryOwnRingtone
     [Export(typeof(SoundManager))]
     public sealed class SoundManager
     {
-        private readonly string[] AvailableSounds = new string[] 
+        private readonly HashSet<string> AvailableSounds = new()
         { 
             "apply",
-            "build",
+            "build.start",
+            "build.onsuccess",
+            "build.onfail",
             "breakpoint",
+            "continue",
             "exception",
             "find",
             "restart",
@@ -54,6 +58,11 @@ namespace YourVeryOwnRingtone
 
         private readonly Guid _paneGuid = new Guid("397DC4BA-0F26-4AF2-B920-3AEB3F551482");
         private const string _paneTitle = "Your very own ringtone!";
+
+        /// <summary>
+        /// Tracks whether the session is currently being debugged.
+        /// </summary>
+        private bool _isDebugging;
 
         public async Task InitializeAsync(IAsyncServiceProvider serviceProvider)
         {
@@ -114,6 +123,8 @@ namespace YourVeryOwnRingtone
             }
             catch
             {
+                _pane?.OutputStringThreadSafe("Invalid .json. Sounds will be unavailable.\n");
+
                 throw new ArgumentException("Unable to deserialize configuration file.");
             }
 
@@ -122,35 +133,38 @@ namespace YourVeryOwnRingtone
 
             lock (_lock)
             {
-                foreach (string sound in AvailableSounds)
+                foreach ((string sound, string valuePath) in sounds)
                 {
-                    if (sounds.TryGetValue(sound, out string valuePath))
+                    if (!AvailableSounds.Contains(sound))
                     {
-                        // We support multiple paths in the same sound, so iterate over all of them.
-                        string[] paths = valuePath.Split(',');
-                        for (int i = 0; i < paths.Length; ++i)
+                        _pane?.OutputStringThreadSafe($"Skipping sound for {sound} event.\n");
+                        continue;
+                    }
+
+                    // We support multiple paths in the same sound, so iterate over all of them.
+                    string[] paths = valuePath.Split(',');
+                    for (int i = 0; i < paths.Length; ++i)
+                    {
+                        string path = paths[i];
+                        if (!Path.IsPathRooted(path))
                         {
-                            string path = paths[i];
-                            if (!Path.IsPathRooted(path))
+                            path = Path.Combine(rootDirectory, path);
+                        }
+
+                        if (File.Exists(path))
+                        {
+                            SoundPlayer player = new(path);
+                            player.LoadAsync();
+
+                            if (!_sounds.TryGetValue(sound, out List<SoundPlayer> soundPlayers))
                             {
-                                path = Path.Combine(rootDirectory, path);
+                                soundPlayers = new();
+                                _sounds[sound] = soundPlayers;
                             }
 
-                            if (File.Exists(path))
-                            {
-                                SoundPlayer player = new(path);
-                                player.LoadAsync();
+                            soundPlayers.Add(player);
 
-                                if (!_sounds.TryGetValue(sound, out List<SoundPlayer> soundPlayers))
-                                {
-                                    soundPlayers = new();
-                                    _sounds[sound] = soundPlayers;
-                                }
-
-                                soundPlayers.Add(player);
-
-                                _pane?.OutputStringThreadSafe($"Loaded sound for {sound} events.\n");
-                            }
+                            _pane?.OutputStringThreadSafe($"Loaded sound for {sound} events.\n");
                         }
                     }
                 }
@@ -174,8 +188,34 @@ namespace YourVeryOwnRingtone
             return result.ToString();
         }
 
-        public void PlaySound(string name)
+        public async Task PlaySoundAsync(string name)
         {
+            // Ensures that the rest of the method runs on a background thread. Simply using ConfigureAwait(false) won't necessarily ensure that's the case,
+            // see https://devblogs.microsoft.com/dotnet/configureawait-faq/#does-configureawaitfalse-guarantee-the-callback-wont-be-run-in-the-original-context
+            await TaskScheduler.Default;
+
+            switch (name)
+            {
+                case "start":
+                case "step":
+                case "breakpoint":
+                    _isDebugging = true;
+                    break;
+
+                case "continue":
+                    if (!_isDebugging)
+                    {
+                        // ignore continue commands if debugging is not active. "start" will be fired for those instead.
+                        return;
+                    }
+
+                    break;
+
+                case "stop":
+                    _isDebugging = false;
+                    break;
+            }
+
             if (!_isEnabled)
             {
                 return;

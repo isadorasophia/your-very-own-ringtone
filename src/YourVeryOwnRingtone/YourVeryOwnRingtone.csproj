@@ -47,6 +47,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Utils.cs" />
     <Compile Include="VSListener.cs" />
     <Compile Include="SoundManager.cs" />
     <Compile Include="OptionsPage.cs">
@@ -61,10 +62,14 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="release_notes.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="themes\lofi\save.wav">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="themes\lofi\start_debug.wav">
+    <Content Include="themes\lofi\buildonsuccess.wav">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="themes\lofi\step_1.wav">
@@ -85,6 +90,10 @@
     <Content Include="themes\lofi\stop.wav">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <Content Include="YVORT.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <None Include="app.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -96,7 +105,7 @@
     <Content Include="themes\lofi\apply_changes.wav">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="themes\lofi\build.wav">
+    <Content Include="themes\lofi\buildonfail.wav">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="themes\lofi\exception.wav">

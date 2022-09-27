@@ -1,10 +1,10 @@
 ﻿{
   "apply": "apply_changes.wav",
-  "build": "build.wav",
+  "build.onsuccess": "buildonsuccess.wav",
+  "build.onfail": "buildonfail.wav",
   "exception": "exception.wav",
   "breakpoint": "hit_breakpoint.wav",
   "save": "save.wav",
-  "start": "start_debug.wav",
   "stepover": "step_1.wav,step_2.wav,step_3.wav",
   "stepinto": "step_into.wav",
   "stepout": "step_out.wav",
