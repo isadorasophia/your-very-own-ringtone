@@ -73,32 +73,14 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="themes\lofi\save.wav">
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="themes\lofi\buildonsuccess.wav">
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="themes\lofi\step_1.wav">
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="themes\lofi\step_2.wav">
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="themes\lofi\step_3.wav">
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="themes\lofi\step_into.wav">
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="themes\lofi\step_out.wav">
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="themes\lofi\stop.wav">
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="YVORT.png">
+    <Content Include="resources\YVORT.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="themes\lofi\*.wav">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="themes\lofi\settings.json">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <None Include="app.config" />
@@ -109,21 +91,6 @@
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
-    <Content Include="themes\lofi\apply_changes.wav">
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="themes\lofi\buildonfail.wav">
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="themes\lofi\exception.wav">
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="themes\lofi\hit_breakpoint.wav">
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="themes\lofi\settings.json">
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

@@ -3,7 +3,7 @@
 This is the project for **Your very own ringtone!**, available at [VS Marketplace](https://marketplace.visualstudio.com/items?itemName=isainstars.yourveryownringtone). This enables you to add sounds to all sorts of Visual Studio events.
 
 ### How do I build it?
-Open `src/YourVeryOwnRingtone.sln` in Visual Studio and click "build". That's it! You can try it by clicking "F5", which will spawn a new Visual Studio instance with the extension installed.
+Open `YourVeryOwnRingtone.sln` in Visual Studio and click "build". That's it! You can try it by clicking "F5", which will spawn a new Visual Studio instance with the extension installed.
 
 ### How do I install it?
 I recommend installing it through the [VS Marketplace](https://marketplace.visualstudio.com/items?itemName=isainstars.yourveryownringtone) page.

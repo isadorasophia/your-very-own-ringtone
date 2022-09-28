@@ -6,7 +6,7 @@
         <Description xml:space="preserve">Add sounds to your Visual Studio debugging experience! Tune in with your very own ringtone.</Description>
         <License>LICENSE.txt</License>
         <ReleaseNotes>release_notes.txt</ReleaseNotes>
-        <Icon>YVORT.png</Icon>
+        <Icon>resources/YVORT.png</Icon>
     </Metadata>
     <Installation>
         <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0, 18.0)">
