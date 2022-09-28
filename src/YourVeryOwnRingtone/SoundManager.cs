@@ -5,18 +5,19 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System;
-using System.Media;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Shell;
 using System.Reflection;
 using Microsoft.VisualStudio.Threading;
+using YourVeryOwnRingtone.MusicBox;
+using IAsyncDisposable = System.IAsyncDisposable;
 
 #nullable enable
 
 namespace YourVeryOwnRingtone
 {
-    [Export(typeof(SoundManager))]
-    public sealed class SoundManager
+    [Export(typeof(SoundManager))]  
+    public sealed class SoundManager : IAsyncDisposable
     {
         private readonly HashSet<string> AvailableSounds = new()
         { 
@@ -39,10 +40,12 @@ namespace YourVeryOwnRingtone
             "undo"
         };
 
+        private readonly MusicBoxEngine _engine = new();
+
         private readonly string _defaultConfigurationFile = Path.Combine(
             Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "themes", "lofi", "settings.json");
 
-        public Dictionary<string, List<SoundPlayer>> _sounds = new();
+        public Dictionary<string, List<SoundCache>> _sounds = new();
 
         private readonly object _lock = new();
 
@@ -153,16 +156,24 @@ namespace YourVeryOwnRingtone
 
                         if (File.Exists(path))
                         {
-                            SoundPlayer player = new(path);
-                            player.LoadAsync();
+                            SoundCache soundCache;
+                            try
+                            {
+                                soundCache = new(path);
+                            }
+                            catch
+                            {
+                                _pane?.OutputStringThreadSafe($"Skipping loading {sound} at {path} due to an internal error :(\n");
+                                continue;
+                            }
 
-                            if (!_sounds.TryGetValue(sound, out List<SoundPlayer> soundPlayers))
+                            if (!_sounds.TryGetValue(sound, out List<SoundCache> soundPlayers))
                             {
                                 soundPlayers = new();
                                 _sounds[sound] = soundPlayers;
                             }
 
-                            soundPlayers.Add(player);
+                            soundPlayers.Add(soundCache);
 
                             _pane?.OutputStringThreadSafe($"Loaded sound for {sound} events.\n");
                         }
@@ -221,11 +232,18 @@ namespace YourVeryOwnRingtone
                 return;
             }
 
-            if (_sounds.TryGetValue(name, out List<SoundPlayer> soundPlayers))
+            if (_sounds.TryGetValue(name, out List<SoundCache> sounds))
             {
-                int soundIndex = _random.Next(soundPlayers.Count);
-                soundPlayers[soundIndex].Play();
+                int soundIndex = _random.Next(sounds.Count);
+                _engine.PlaySound(sounds[soundIndex]);
             }
+        }
+
+        public ValueTask DisposeAsync()
+        {
+            _engine.Dispose();
+
+            return default;
         }
     }
 }

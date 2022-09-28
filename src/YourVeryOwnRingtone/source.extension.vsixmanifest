@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="YourVeryOwnRingtone.08dfcd2b-cfb1-4a7c-af87-dbad3e887477" Version="1.5" Language="en-US" Publisher="isainstars" />
+        <Identity Id="YourVeryOwnRingtone.08dfcd2b-cfb1-4a7c-af87-dbad3e887477" Version="1.6" Language="en-US" Publisher="isainstars" />
         <DisplayName>Your very own ringtone!</DisplayName>
         <Description xml:space="preserve">Add sounds to your Visual Studio debugging experience! Tune in with your very own ringtone.</Description>
+        <License>LICENSE.txt</License>
         <ReleaseNotes>release_notes.txt</ReleaseNotes>
         <Icon>YVORT.png</Icon>
     </Metadata>

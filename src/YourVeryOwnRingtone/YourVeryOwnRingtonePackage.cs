@@ -5,6 +5,7 @@ using System;
 using System.ComponentModel.Composition;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Threading.Tasks;
 using Task = System.Threading.Tasks.Task;
 
 #nullable enable
@@ -36,7 +37,7 @@ namespace YourVeryOwnRingtone
     [ProvideMenuResource("Menus.ctmenu", 1)] // Let the shell know that this package expose a menu.
     [ProvideOptionPage(typeof(OptionsPage), categoryName: "Your very own ringtone!", pageName: "Sounds",
         categoryResourceID: 0, pageNameResourceID: 0, supportsAutomation: false, keywordListResourceId: 0)]
-    public sealed class YourVeryOwnRingtonePackage : AsyncPackage
+    public sealed class YourVeryOwnRingtonePackage : AsyncPackage, IAsyncDisposable
     {
         /// <summary>
         /// YourVeryOwnRingtonePackage GUID string.
@@ -79,6 +80,11 @@ namespace YourVeryOwnRingtone
 
             _listener = new(_soundManager);
             await _listener.InitializeAsync(this);
+        }
+
+        public async ValueTask DisposeAsync()
+        {
+            await _soundManager.DisposeAsync();
         }
 
         #endregion
