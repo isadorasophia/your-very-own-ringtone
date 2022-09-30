@@ -10,9 +10,9 @@ I recommend installing it through the [VS Marketplace](https://marketplace.visua
 
 ### How do I use it?
 1. Create a json configuration file.
-Check [settings.json](src/YourVeryOwnRingtone/themes/lofi/settings.json) for an example. 
+Check [settings.json](src/themes/lofi/settings.json) for an example. 
 2. Open Visual Studio and go to _Tools > Options > Your very own ringtone!_.
-3. Add your path to "Configuration file".
+3. Add the file with its complete path to "Configuration file".
 
 ✨ **Features**
 - Play different sounds for the same command \
