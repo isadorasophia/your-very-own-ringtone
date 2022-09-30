@@ -1,7 +1,6 @@
 ﻿using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using System;
-using System.ComponentModel.Composition;
 
 namespace YourVeryOwnRingtone.MusicBox
 {
@@ -10,7 +9,9 @@ namespace YourVeryOwnRingtone.MusicBox
         private readonly IWavePlayer _outputDevice;
         private readonly MixingSampleProvider _mixer;
 
-        public MusicBoxEngine(int sampleRate = 44100, int channelCount = 2)
+        public const int DEFAULT_SAMPLE_RATE = 44100;
+
+        public MusicBoxEngine(int sampleRate = DEFAULT_SAMPLE_RATE, int channelCount = 2)
         {
             _outputDevice = new WaveOutEvent();
             _mixer = new(WaveFormat.CreateIeeeFloatWaveFormat(sampleRate, channelCount));

@@ -1,2 +1,3 @@
 ﻿1.5: Fixed "start" command and add a new "continue" command. Improve logging when unable to load sounds from custom .json file.
 1.6: Now sounds can overlap and be loaded in formats that are not ".wav".
+1.61: Fix bug when a sound file has a sample rate different than 44100.
